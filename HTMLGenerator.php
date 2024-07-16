@@ -48,18 +48,58 @@ class HTMLElement {
 }
 
 class HTMLDocument {
-    private $elements = [];
+    private $headElements = [];
+    private $bodyElements = [];
+    private $title = '';
+    private $charset = 'UTF-8';
+    private $viewport = 'width=device-width, initial-scale=1.0';
 
-    public function addElement(HTMLElement $element) {
-        $this->elements[] = $element;
+    public function setTitle($title) {
+        $this->title = $title;
+    }
+
+    public function setCharset($charset) {
+        $this->charset = $charset;
+    }
+
+    public function setViewport($viewport) {
+        $this->viewport = $viewport;
+    }
+
+    public function addHeadElement(HTMLElement $element) {
+        $this->headElements[] = $element;
+    }
+
+    public function addBodyElement(HTMLElement $element) {
+        $this->bodyElements[] = $element;
+    }
+
+    public function createElement($tag, $content = "", $attributes = [], $styles = []) {
+        return new HTMLElement($tag, $content, $attributes, $styles);
     }
 
     public function render() {
-        $html = "";
-        foreach ($this->elements as $element) {
-            $html .= $element->render() . "\n";
+        $headContent = $this->renderHead();
+        $bodyContent = $this->renderBody();
+        return "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n{$headContent}\n</head>\n<body>\n{$bodyContent}\n</body>\n</html>";
+    }
+
+    private function renderHead() {
+        $headContent = "<meta charset=\"{$this->charset}\">\n";
+        $headContent .= "<meta name=\"viewport\" content=\"{$this->viewport}\">\n";
+        $headContent .= "<title>{$this->title}</title>\n";
+        foreach ($this->headElements as $element) {
+            $headContent .= $element->render() . "\n";
         }
-        return $html;
+        return $headContent;
+    }
+
+    private function renderBody() {
+        $bodyContent = "";
+        foreach ($this->bodyElements as $element) {
+            $bodyContent .= $element->render() . "\n";
+        }
+        return $bodyContent;
     }
 }
 ?>
